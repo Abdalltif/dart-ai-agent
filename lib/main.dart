@@ -1,3 +1,5 @@
+import 'package:dart_ai_agent/parsers/agent_output_parser.dart';
+
 import 'agent_orchestrator.dart';
 import 'llm_client.dart';
 import 'prompt_builder.dart';
@@ -5,23 +7,22 @@ import 'tool_router.dart';
 import 'tools/calculator_tool.dart';
 
 Future<void> main() async {
-  final calculatorTool = CalculatorTool();
-
   final toolRouter = ToolRouter([
-    calculatorTool,
+    CalculatorTool(),
   ]);
 
-  final llmClient = FakeLLMClient();
-
-  final promptBuilder = PromptBuilder();
-
   final agent = AgentOrchestrator(
-    llmClient: llmClient,
+    llmClient: FakeLLMClient(),
     toolRouter: toolRouter,
-    promptBuilder: promptBuilder,
+    promptBuilder: PromptBuilder(),
+    outputParser: AgentOutputParser(),
   );
 
-  final answer = await agent.run('What is 10 + 5?');
+  final result = await agent.run('What is 25 * 4?');
 
-  print(answer);
+  print(result.answer);
+
+  print('');
+  print('Agent trace:');
+  result.state.trace.printTrace();
 }
