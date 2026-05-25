@@ -1,6 +1,6 @@
 import 'package:dart_ai_agent/parsers/agent_output_parser.dart';
 
-import 'llm_client.dart';
+import 'llm/llm_client.dart';
 import 'models/agent_output.dart';
 import 'models/agent_state.dart';
 import 'models/agent_step.dart';
