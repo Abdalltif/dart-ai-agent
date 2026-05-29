@@ -2,6 +2,7 @@ class PromptBuilder {
   String build({
     required String userMessage,
     required List<Map<String, dynamic>> tools,
+    required String conversationHistory,
     String? toolName,
     dynamic toolResult,
   }) {
@@ -11,7 +12,7 @@ class PromptBuilder {
     buffer.writeln();
     buffer.writeln('Return valid JSON only.');
     buffer.writeln('Do not use markdown.');
-    buffer.writeln('Do not explain.');
+    buffer.writeln('Do not explain outside the JSON.');
     buffer.writeln();
 
     buffer.writeln('Available tools:');
@@ -22,16 +23,24 @@ class PromptBuilder {
     }
 
     buffer.writeln();
+    buffer.writeln('Conversation history:');
+    buffer.writeln(conversationHistory);
+
+    buffer.writeln();
+    buffer.writeln('Current user message:');
+    buffer.writeln(userMessage);
+
+    buffer.writeln();
     buffer.writeln('Allowed JSON outputs:');
     buffer.writeln('Tool call:');
-    buffer.writeln('{"type":"tool_call","toolName":"calculator","arguments":{"expression":"10 + 5"}}');
+    buffer.writeln(
+      '{"type":"tool_call","toolName":"calculator","arguments":{"expression":"10 + 5"}}',
+    );
     buffer.writeln();
     buffer.writeln('Final answer:');
-    buffer.writeln('{"type":"final_answer","answer":"10 + 5 equals 15."}');
-    buffer.writeln();
-
-    buffer.writeln('User message:');
-    buffer.writeln(userMessage);
+    buffer.writeln(
+      '{"type":"final_answer","answer":"10 + 5 equals 15."}',
+    );
 
     if (toolName != null && toolResult != null) {
       buffer.writeln();
@@ -42,7 +51,7 @@ class PromptBuilder {
       buffer.writeln('Now return final_answer JSON only.');
     } else {
       buffer.writeln();
-      buffer.writeln('Decide whether to call a tool or return a final_answer.');
+      buffer.writeln('Decide whether to call a tool or return final_answer.');
     }
 
     return buffer.toString();

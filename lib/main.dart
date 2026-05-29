@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'agent_orchestrator.dart';
 import 'llm/llama_cpp_client.dart';
+import 'memory/conversation_memory.dart';
 
 
 void main() {
@@ -75,11 +76,16 @@ class _ChatScreenState extends State<ChatScreen> {
       CalculatorTool(),
     ]);
 
+    final memory = ConversationMemory(
+      maxMessages: 12,
+    );
+
     _agent = AgentOrchestrator(
       llmClient: llmClient,
       toolRouter: toolRouter,
       promptBuilder: PromptBuilder(),
       outputParser: AgentOutputParser(),
+      memory: memory,
     );
   }
 
@@ -142,11 +148,31 @@ $e
     }
   }
 
+  void _clearChat() {
+    setState(() {
+      _messages.clear();
+      _messages.add(
+        const ChatMessage(
+          text: 'Memory cleared. Ask me a new question.',
+          isUser: false,
+        ),
+      );
+    });
+
+    _agent.clearMemory();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Simple AI Agent'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            onPressed: _clearChat,
+          ),
+        ],
       ),
       body: Column(
         children: [

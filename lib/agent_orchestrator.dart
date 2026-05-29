@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:dart_ai_agent/parsers/agent_output_parser.dart';
 
 import 'llm/llm_client.dart';
+import 'memory/conversation_memory.dart';
 import 'models/agent_output.dart';
 import 'models/agent_state.dart';
 import 'models/agent_step.dart';
@@ -22,15 +25,19 @@ class AgentOrchestrator {
   final ToolRouter toolRouter;
   final PromptBuilder promptBuilder;
   final AgentOutputParser outputParser;
+  final ConversationMemory memory;
 
   AgentOrchestrator({
     required this.llmClient,
     required this.toolRouter,
     required this.promptBuilder,
     required this.outputParser,
+    required this.memory,
   });
 
   Future<AgentRunResult> run(String userMessage) async {
+    memory.addUserMessage(userMessage);
+
     final state = AgentState(
       userMessage: userMessage,
       maxIterations: 5,
@@ -49,6 +56,7 @@ class AgentOrchestrator {
       final prompt = promptBuilder.build(
         userMessage: userMessage,
         tools: tools,
+        conversationHistory: memory.buildHistoryText(),
         toolName: lastToolName,
         toolResult: lastToolResult,
       );
@@ -59,6 +67,8 @@ class AgentOrchestrator {
       if (output is FinalAnswerOutput) {
         state.finalAnswer = output.answer;
         state.status = AgentStatus.completed;
+
+        memory.addAssistantMessage(output.answer);
 
         state.trace.addStep(
           AgentStep(
@@ -84,6 +94,14 @@ class AgentOrchestrator {
         lastToolName = output.toolName;
         lastToolResult = toolResult.toJson();
 
+        memory.addToolMessage(
+          jsonEncode({
+            'toolName': output.toolName,
+            'arguments': output.arguments,
+            'result': toolResult.toJson(),
+          }),
+        );
+
         state.trace.addStep(
           AgentStep(
             index: state.currentIteration,
@@ -102,9 +120,16 @@ class AgentOrchestrator {
     state.status = AgentStatus.maxIterationsReached;
     state.error = 'Max iterations reached.';
 
+    const fallbackAnswer = 'I could not complete the task.';
+    memory.addAssistantMessage(fallbackAnswer);
+
     return AgentRunResult(
-      answer: 'I could not complete the task.',
+      answer: fallbackAnswer,
       state: state,
     );
+  }
+
+  void clearMemory() {
+    memory.clear();
   }
 }
