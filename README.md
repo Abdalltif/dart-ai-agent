@@ -1,17 +1,27 @@
-# dart_ai_agent
+# Dart AI Agent
 
-A new Flutter project.
+A robust AI Agent framework built with Dart and Flutter. This project enables Large Language Models to interact with tools and solve complex tasks through a reasoning-action loop.
+
+## Features
+
+- **Autonomous Agent**: Orchestrates complex task solving through multi-step reasoning.
+- **Tool Integration**: Easily add custom tools for the agent to use.
+- **LLM Agnostic**: Supports multiple LLM backends (currently configured for llama.cpp).
+- **Full Traceability**: Detailed logging of every step, including prompts and tool results.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
+- Flutter SDK
+- A running LLM server (e.g., llama.cpp or any OpenAI-compatible API) at `http://localhost:8080`.
 
-A few resources to get you started if this is your first Flutter project:
+### Documentation
+Detailed information about the architecture and features can be found in the [Architecture Documentation](docs/architecture.md).
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Project Structure
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# dart-ai-agent
+- `lib/agent_orchestrator.dart`: Main orchestration logic.
+- `lib/llm/`: LLM client implementations.
+- `lib/tools/`: Custom tools for the agent.
+- `lib/parsers/`: Logic for parsing LLM outputs.
+- `lib/models/`: Data models for agent state and tracing.
